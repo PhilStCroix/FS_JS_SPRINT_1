@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = 3000;
@@ -14,7 +15,6 @@ app.get('/', (req, res) => {
 
 app.post('/generate-token', (req, res) => {
   const username = req.body.username;
-  // Code to generate a token based on username
   const token = generateToken(username);
   res.send(`Your generated token is: ${token}`);
 });
@@ -24,7 +24,9 @@ app.listen(PORT, () => {
 });
 
 function generateToken(username) {
-  // Code to generate a token based on username
-  // Implement your token generation logic here
-  // For example, you can use crypto or CRC libraries for generating tokens
+  // Generate a random buffer of 16 bytes (128 bits)
+  const randomBytes = crypto.randomBytes(16);
+  // Convert the random buffer to a hexadecimal string
+  const token = randomBytes.toString('hex');
+  return token;
 }
