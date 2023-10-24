@@ -96,6 +96,7 @@ function updateToken(argv) {
                         break;
                     default:
                         // TODO: handle incorrect options #
+                        console.log('Invalid option. Use -p for phone or -e for email.');
                 }
                 if(DEBUG) console.log(obj);
             }
@@ -121,7 +122,7 @@ function tokenApp() {
       break;
   case '--list':
       if(DEBUG) console.log('token.tokenList() --list');
-      // tokenList();
+      tokenList();
       break; 
   case '--new':
       if (myArgs.length < 3) {
@@ -144,12 +145,25 @@ function tokenApp() {
           console.log('invalid syntax. node myapp token --fetch [username]')
           myEmitter.emit('log', 'token.fetchRecord() --fetch', 'WARNING', 'invalid syntax, usage displayed');
       } else {
-          // fetchRecord(myArgs[2]);
+          fetchToken(myArgs[2]);
       }
       break;
   case '--search':
       if(DEBUG) console.log('token.searchToken()');
-  //    searchToken();
+      if (myArgs.length < 3) {
+        console.log('invalid syntax. node myappl token --search [criteria]');
+        myEmitter.emit('log', 'token.searchToken() --search', 'WARNING', 'invalid syntax, usage displayed');
+      } else {
+        searchToken(myArgs[2]);
+      }
+      break;
+  case '-add':
+      if (myArgs.length <4) {
+        console.log('Invalid syntax. Usage: node myapp user --add [username] [email] [phone]');
+        myEmitter.emit('log', 'user.addUser() -- add', 'WARNING', 'Invalid syntax, usage displayed');
+      } else {
+            addUser(myArgs[2], myArgs[3], myArgs[4]);
+      }
       break;
   case '--help':
   case '--h':
@@ -173,7 +187,102 @@ function tokenList() {
 }
 
 function fetchToken(username) {
-    if (DEBUG)
+    if (DEBUG) console.log('token.fetchToken()');
+    fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+        if (error) throw error;
+        let tokens = JSON.parse(data);
+        const foundToken = tokens.find(token => token.username === username);
+        if (foundToken) {
+            console.log(`Token for ${username}: ${foundToken.token}`);
+        } else {
+            console.log(`Token not found for username: ${username}`)
+        }
+    } )
+}
+
+function searchToken(criteria) {
+    if (DEBUG) console.log('token.searchToken()');
+
+    fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+        if (error) throw error;
+
+        let token = JSON.parse(data);
+
+        const results = token.filter(token => {
+            return token.username.toLowerCase().includes(criteria.toLowerCase());
+        });
+
+        if (results.length > 0) {
+            console.log(`Tokens matching the criteria:`);
+            results.forEach(token => {
+                console.log(`Token: ${token.token}, Username: ${token.username}`);
+            });
+        } else {
+            console.log('No tokens found matching the criteria.');
+        }
+    })
+}
+
+function addUser(username, email, phone) {
+    if (DEBUG) console.log('user.addUser()');
+
+    fs.readFile(__dirname + '/json/users.json', 'utf-8', (error, data) => {
+        if (error) throw error;
+
+        let users = JSON.parse(data);
+
+        if (users.find(user => user.username === username)) {
+            console.log(`User with username ${username} already exists.`);
+            return;
+        }
+
+        const newUser = {
+            username,
+            email,
+            phone
+        };
+
+        users.push(newUser);
+
+        fs.writeFile(__dirname + '/json/users.json', JSON.stringify(users, null, 2), (err) => {
+            if (err) console.log(err);
+            else {
+                console.log(`User ${username} added with email: ${email} and phone: ${phone}`);
+                myEmitter.emit('log', 'user.addUser()', 'INFO', `User ${username} added with email: ${email} and phone: ${phone}`)
+            }
+        })
+    })
+}
+
+function updateUser(username, email, phone) {
+    if (DEBUG) console.log('user.updateUser()');
+
+    fs.readFile(__dirname + '/json/users.json', 'utf-8', (error, data) => {
+        if (error) throw error;
+
+        let users = JSON.parse(data);
+
+        const user = users.find(user => user.username === username);
+
+        if (user) {
+            if (email) {
+                user.email = email;
+            }
+            if (phone) {
+                user.phone = phone;
+            }
+
+            fs.writeFile(__dirname + '/json/users.json', JSON.stringify(users, null, 2), (err) => {
+                if (err) console.log(err);
+                else {
+                    console.log(`User ${username} updated with email: ${user.email} and phone: ${user.phone}`);
+                    myEmitter.emit('log', 'user.updateUser()', 'INFO', `User ${username} updated with email: ${user.email} and phone: ${user.phone}`);
+                }
+            });
+        } else {
+            console.log(`User with username ${username} not found.`)
+        }
+    });
 }
 
 function addDays(date, days) {
