@@ -98,5 +98,7 @@ function initializeApp() {
 
 module.exports = {
     initializeApp,
+    createFolders,
+    createFiles,
     myEmitter  // Export the emitter for external use if needed
 };

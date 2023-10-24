@@ -1,4 +1,4 @@
-global.DEBUG = false;
+global.DEBUG = true;
 const http = require('http');
 const fs = require('fs');
 const { parse } = require('querystring');

@@ -1,4 +1,4 @@
-global.DEBUG = false;
+global.DEBUG = true;
 
 const fs = require('fs');
 const { initializeApp } = require('./init.js');
@@ -32,3 +32,5 @@ switch (myArgs[0]) {
       console.log(data.toString());
     });
 }
+
+

@@ -189,7 +189,6 @@ case '--search':
           break;
         default:
           console.log('Invalid search type. Please use "e" for email, "p" for phone, or "u" for username.');
-          searchToken('u', searchCriteria);
           break;
       }
     }
@@ -279,21 +278,18 @@ function searchToken(type, criteria) {
         let results = [];
 
         switch (type) {
-            case 'E':
             case 'e':
                 results = tokens.filter(token => token.email.toLowerCase().includes(criteria.toLowerCase()));
                 break;
-            case 'P':
             case 'p':
                 results = tokens.filter(token => token.phone.toLowerCase().includes(criteria.toLowerCase()));
                 break;
-            case 'U':
             case 'u':
                 results = tokens.filter(token => token.username.toLowerCase().includes(criteria.toLowerCase()));
                 break;
             default:
                 console.log('Invalid search type. Please use "e" for email, "p" for phone, or "u" for username.');
-                return;
+                break;
         }
 
         if (results.length > 0) {
