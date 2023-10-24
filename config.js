@@ -35,6 +35,12 @@ function resetConfig() {
 }
 
 function setConfig() {
+    if (myArgs.length < 4) {
+        console.log('Invalid syntax. Usage: node myapp config --set [key] [value]');
+        myEmitter.emit('log', 'config.setConfig()', 'WARNING', 'Invalid syntax, usage displayed');
+        return;
+    }
+    
     let match = false;
     fs.readFile(__dirname + "/json/config.json", (error, data) => {
         if (error) {
