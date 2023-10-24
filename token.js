@@ -158,15 +158,41 @@ function tokenApp() {
           fetchToken(myArgs[2]);
       }
       break;
-  case '--search':
-      if(DEBUG) console.log('token.searchToken()');
-      if (myArgs.length < 3) {
-        console.log('invalid syntax. node myappl token --search [criteria]');
-        myEmitter.emit('log', 'token.searchToken() --search', 'WARNING', 'invalid syntax, usage displayed');
-      } else {
-        searchToken(myArgs[2]);
+//   case '--search':
+//       if(DEBUG) console.log('token.searchToken()');
+//       if (myArgs.length < 3) {
+//         console.log('invalid syntax. node myappl token --search [criteria]');
+//         myEmitter.emit('log', 'token.searchToken() --search', 'WARNING', 'invalid syntax, usage displayed');
+//       } else {
+//         searchToken(myArgs[2]);
+//       }
+//       break;
+
+case '--search':
+    if (DEBUG) console.log('token.searchToken()');
+    if (myArgs.length < 3) {
+      console.log('invalid syntax. node myappl token --search [criteria]');
+      myEmitter.emit('log', 'token.searchToken() --search', 'WARNING', 'invalid syntax, usage displayed');
+    } else {
+      const searchType = myArgs[2][0];
+      const searchCriteria = myArgs.slice(3).join(' ');
+
+      switch (searchType) {
+        case 'e':
+          searchToken('e', searchCriteria);
+          break;
+        case 'p':
+          searchToken('p', searchCriteria);
+          break;
+        case 'u':
+          searchToken('u', searchCriteria);
+          break;
+        default:
+          console.log('Invalid search type. Please use "e" for email, "p" for phone, or "u" for username.');
+          break;
       }
-      break;
+    }
+    break;
   case '-add':
       if (myArgs.length <4) {
         console.log('Invalid syntax. Usage: node myapp user --add [username] [email] [phone]');
@@ -218,17 +244,56 @@ function fetchToken(username) {
     } )
 }
 
-function searchToken(criteria) {
+// function searchToken(criteria) {
+//     if (DEBUG) console.log('token.searchToken()');
+
+//     fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+//         if (error) throw error;
+
+//         let token = JSON.parse(data);
+
+//         const results = token.filter(token => {
+//             return token.username.toLowerCase().includes(criteria.toLowerCase());
+//         });
+
+//         if (results.length > 0) {
+//             console.log(`Tokens matching the criteria:`);
+//             results.forEach(token => {
+//                 console.log(`Token: ${token.token}, Username: ${token.username}`);
+//             });
+//         } else {
+//             console.log('No tokens found matching the criteria.');
+//         }
+//     })
+// }
+
+function searchToken(type, criteria) {
     if (DEBUG) console.log('token.searchToken()');
 
     fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
         if (error) throw error;
 
-        let token = JSON.parse(data);
+        let tokens = JSON.parse(data);
 
-        const results = token.filter(token => {
-            return token.username.toLowerCase().includes(criteria.toLowerCase());
-        });
+        let results = [];
+
+        switch (type) {
+            case 'E':
+            case 'e':
+                results = tokens.filter(token => token.email.toLowerCase().includes(criteria.toLowerCase()));
+                break;
+            case 'P':
+            case 'p':
+                results = tokens.filter(token => token.phone.toLowerCase().includes(criteria.toLowerCase()));
+                break;
+            case 'U':
+            case 'u':
+                results = tokens.filter(token => token.username.toLowerCase().includes(criteria.toLowerCase()));
+                break;
+            default:
+                console.log('Invalid search type. Please use "e" for email, "p" for phone, or "u" for username.');
+                return;
+        }
 
         if (results.length > 0) {
             console.log(`Tokens matching the criteria:`);
@@ -238,8 +303,9 @@ function searchToken(criteria) {
         } else {
             console.log('No tokens found matching the criteria.');
         }
-    })
+    });
 }
+
 
 function addUser(username, email, phone) {
     if (DEBUG) console.log('user.addUser()');
