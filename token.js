@@ -189,6 +189,7 @@ case '--search':
           break;
         default:
           console.log('Invalid search type. Please use "e" for email, "p" for phone, or "u" for username.');
+          searchToken('u', searchCriteria);
           break;
       }
     }
