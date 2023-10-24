@@ -79,36 +79,46 @@ function newToken(username) {
 function updateToken(argv) {
     if(DEBUG) console.log('token.updateToken()');
     if(DEBUG) console.log(argv);
+
     fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
         if(error) throw error; 
+
         let tokens = JSON.parse(data);
+        let updated = false; 
+
         tokens.forEach(obj => {
             if(obj.username === argv[3]) {
                 if(DEBUG) console.log(obj);
-                switch (argv[2]) {
+
+                switch (argv[2].toLowerCase()) {
                     case 'p':
-                    case 'P':
                         obj.phone = argv[4];
+                        updated = true;
                         break;
                     case 'e':
-                    case 'E':
                         obj.email = argv[4];
+                        updated = true;
                         break;
                     default:
                         // TODO: handle incorrect options #
                         console.log('Invalid option. Use -p for phone or -e for email.');
+                        return;
                 }
+
                 if(DEBUG) console.log(obj);
             }
         });
-        userTokens = JSON.stringify(tokens);
-        fs.writeFile(__dirname + '/json/tokens.json', userTokens, (err) => {
-            if (err) console.log(err);
-            else { 
-                console.log(`Token record for ${argv[3]} was updated with ${argv[4]}.`);
-                myEmitter.emit('log', 'token.updateToken()', 'INFO', `Token record for ${argv[3]} was updated with ${argv[4]}.`);
-            }
-        })
+
+        if (updated) {
+            const userTokens = JSON.stringify(tokens);
+            fs.writeFile(__dirname + '/json/tokens.json', userTokens, (err) => {
+                if (err) console.log(err);
+                else {
+                    console.log(`Token record for ${argv[3]} was updated with ${argv[4]}.`);
+                    myEmitter.emit('log', 'token.updateToken()', 'INFO', `Token record for ${argv[3]} was updated with ${argv[4]}.` )
+                }
+            });
+        }
     });
 }
 
@@ -148,15 +158,41 @@ function tokenApp() {
           fetchToken(myArgs[2]);
       }
       break;
-  case '--search':
-      if(DEBUG) console.log('token.searchToken()');
-      if (myArgs.length < 3) {
-        console.log('invalid syntax. node myappl token --search [criteria]');
-        myEmitter.emit('log', 'token.searchToken() --search', 'WARNING', 'invalid syntax, usage displayed');
-      } else {
-        searchToken(myArgs[2]);
+//   case '--search':
+//       if(DEBUG) console.log('token.searchToken()');
+//       if (myArgs.length < 3) {
+//         console.log('invalid syntax. node myappl token --search [criteria]');
+//         myEmitter.emit('log', 'token.searchToken() --search', 'WARNING', 'invalid syntax, usage displayed');
+//       } else {
+//         searchToken(myArgs[2]);
+//       }
+//       break;
+
+case '--search':
+    if (DEBUG) console.log('token.searchToken()');
+    if (myArgs.length < 3) {
+      console.log('invalid syntax. node myappl token --search [criteria]');
+      myEmitter.emit('log', 'token.searchToken() --search', 'WARNING', 'invalid syntax, usage displayed');
+    } else {
+      const searchType = myArgs[2][0];
+      const searchCriteria = myArgs.slice(3).join(' ');
+
+      switch (searchType) {
+        case 'e':
+          searchToken('e', searchCriteria);
+          break;
+        case 'p':
+          searchToken('p', searchCriteria);
+          break;
+        case 'u':
+          searchToken('u', searchCriteria);
+          break;
+        default:
+          console.log('Invalid search type. Please use "e" for email, "p" for phone, or "u" for username.');
+          break;
       }
-      break;
+    }
+    break;
   case '-add':
       if (myArgs.length <4) {
         console.log('Invalid syntax. Usage: node myapp user --add [username] [email] [phone]');
@@ -165,6 +201,14 @@ function tokenApp() {
             addUser(myArgs[2], myArgs[3], myArgs[4]);
       }
       break;
+  case '--info':
+    if (myArgs.length <3) {
+        console.log('invalid syntax. node myapp token --info [username');
+        myEmitter.emit('log', 'token.searchUserToken() --info', 'WARNING', 'invalid syntax, usage displayed');
+    } else {
+        searchUserToken(myArgs[2]);
+    }
+    break;
   case '--help':
   case '--h':
   default:
@@ -200,17 +244,56 @@ function fetchToken(username) {
     } )
 }
 
-function searchToken(criteria) {
+// function searchToken(criteria) {
+//     if (DEBUG) console.log('token.searchToken()');
+
+//     fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+//         if (error) throw error;
+
+//         let token = JSON.parse(data);
+
+//         const results = token.filter(token => {
+//             return token.username.toLowerCase().includes(criteria.toLowerCase());
+//         });
+
+//         if (results.length > 0) {
+//             console.log(`Tokens matching the criteria:`);
+//             results.forEach(token => {
+//                 console.log(`Token: ${token.token}, Username: ${token.username}`);
+//             });
+//         } else {
+//             console.log('No tokens found matching the criteria.');
+//         }
+//     })
+// }
+
+function searchToken(type, criteria) {
     if (DEBUG) console.log('token.searchToken()');
 
     fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
         if (error) throw error;
 
-        let token = JSON.parse(data);
+        let tokens = JSON.parse(data);
 
-        const results = token.filter(token => {
-            return token.username.toLowerCase().includes(criteria.toLowerCase());
-        });
+        let results = [];
+
+        switch (type) {
+            case 'E':
+            case 'e':
+                results = tokens.filter(token => token.email.toLowerCase().includes(criteria.toLowerCase()));
+                break;
+            case 'P':
+            case 'p':
+                results = tokens.filter(token => token.phone.toLowerCase().includes(criteria.toLowerCase()));
+                break;
+            case 'U':
+            case 'u':
+                results = tokens.filter(token => token.username.toLowerCase().includes(criteria.toLowerCase()));
+                break;
+            default:
+                console.log('Invalid search type. Please use "e" for email, "p" for phone, or "u" for username.');
+                return;
+        }
 
         if (results.length > 0) {
             console.log(`Tokens matching the criteria:`);
@@ -220,8 +303,9 @@ function searchToken(criteria) {
         } else {
             console.log('No tokens found matching the criteria.');
         }
-    })
+    });
 }
+
 
 function addUser(username, email, phone) {
     if (DEBUG) console.log('user.addUser()');
@@ -283,6 +367,29 @@ function updateUser(username, email, phone) {
             console.log(`User with username ${username} not found.`)
         }
     });
+}
+
+function searchUserToken(username) {
+    if (DEBUG) console.log('searchUserToken()');
+
+    fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+        if (error) throw error;
+
+        let tokens = JSON.parse(data);
+
+        const userToken = tokens.find(token => token.username === username);
+
+        if (userToken) {
+            console.log(`User Information for ${username}:`)
+            console.log(`Username: ${userToken.username}`)
+            console.log(`Phone: ${userToken.phone}`);
+            console.log(`Email: ${userToken.email}`);
+            console.log(`Token ID: ${userToken.token}`);
+        } else {
+            console.log(`User not found for username: ${username}`);
+        }
+    })
+
 }
 
 function addDays(date, days) {
