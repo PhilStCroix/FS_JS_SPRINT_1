@@ -161,6 +161,21 @@ function tokenApp() {
   }
 }
 
+function tokenList() {
+    if (DEBUG) console.log('token.tokenList() --list');
+    fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+        if (error) throw error;
+        let tokens = JSON.parse(data);
+        tokens.forEach(token => {
+            console.log(`Token: ${token.token}, Username: ${token.username}`);
+        });
+    });
+}
+
+function fetchToken(username) {
+    if (DEBUG)
+}
+
 function addDays(date, days) {
     var result = new Date(date);
     result.setDate(result.getDate() + days);
