@@ -1,0 +1,23 @@
+{
+  "name": "fs_js_sprint_1",
+  "version": "1.0.0",
+  "description": "Sam, Frank and Phil's sprint project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PhilStCroix/FS_JS_SPRINT_1.git"
+  },
+  "author": "Samantha Hynes, Frank Corcoran and Phil StCroix",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PhilStCroix/FS_JS_SPRINT_1/issues"
+  },
+  "homepage": "https://github.com/PhilStCroix/FS_JS_SPRINT_1#readme",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "fs": "^0.0.1-security"
+  }
+}
