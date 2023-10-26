@@ -34,6 +34,11 @@ const server = http.createServer(async (req, res) => {
                 fetchFile(path);
             };
             break;
+        case '/public/styles.css':
+            path += "styles.css";
+            res.statusCode=200;
+            fetchFile(path, 'text/css');
+            break;
         case '/count':
             var theCount = await tokenCount();
             res.end(`
@@ -45,6 +50,7 @@ const server = http.createServer(async (req, res) => {
                 </body>
                 </html>
             `);
+            break;
         default:
             break;
     };
