@@ -36,11 +36,28 @@ const server = http.createServer(async (req, res) => {
                     res.write(`
                     <!doctype html>
                     <html>
-                    <body>
-                        ${result.username} token is ${theToken} <br />
-                        <a href="http://localhost:3000">[home]</a>
-                    </body>
-                    </html>
+                    <head>
+                        <link rel="stylesheet" type="text/css" href="/styles.css">
+                        <style>
+                            /* Add your custom CSS styles here */
+                            body {
+                                font-family: Arial, sans-serif;
+                                background-color: #f0f0f0;
+                                text-align: center;
+                            }
+                            .homepage {
+                                text-align: center;
+                            }
+                            /* Other custom styles specific to the '/new' page */
+                    </style>
+            </head>
+            <body>
+            <br/>
+                ${result.username}'s token is ${theToken} <br />
+                <br/>
+                <a href="http://localhost:3000">Home</a>
+            </body>
+            </html>
                 `);
                 res.end();
                 });
@@ -60,14 +77,30 @@ const server = http.createServer(async (req, res) => {
         case '/count':
             var theCount = await tokenCount();
             res.end(`
-                <!doctype html>
-                <html>
+            <!DOCTYPE html>
+            <html>
+            <head>
                 <link rel="stylesheet" type="text/css" href="/styles.css">
-                <body>
-                    Token count is ${theCount} <br />
-                    <a href="http://localhost:3000">[home]</a>
-                </body>
-                </html>
+                <style>
+                    /* Add styles specific to the '/count' page here */
+                    body {
+                        font-family: Arial, sans-serif;
+                        background-color: #f0f0f0;
+                        text-align: center;
+                    }
+                    .homepage {
+                        text-align: center;
+                    }
+                    /* Other styles as needed */
+                </style>
+            </head>
+            <body>
+            <br/>
+                Token count is ${theCount} <br />
+                <br/>
+                <a href="http://localhost:3000">Home</a>
+            </body>
+            </html>
             `);
             break;
         default:
