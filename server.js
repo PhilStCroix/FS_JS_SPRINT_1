@@ -3,6 +3,23 @@ const http = require('http');
 const fs = require('fs');
 const { parse } = require('querystring');
 const { newToken, tokenCount } = require('./token');
+const path = require('path');
+
+function serveStaticFile(filePath, contentType, res) {
+    const absolutePath = path.join(__dirname, filePath);
+
+    fs.readFile(filePath, (err, data) => {
+        if (err) {
+            console.error(err);
+            res.statusCode = 404;
+            res.end('File not found');
+        } else {
+            res.setHeader('Content-type', contentType);
+            res.statusCode = 200;
+            res.end(data);
+        }
+    });
+}
 
 const server = http.createServer(async (req, res) => {
     let path = './public/';
@@ -19,11 +36,28 @@ const server = http.createServer(async (req, res) => {
                     res.write(`
                     <!doctype html>
                     <html>
-                    <body>
-                        ${result.username} token is ${theToken} <br />
-                        <a href="http://localhost:3000">[home]</a>
-                    </body>
-                    </html>
+                    <head>
+                        <link rel="stylesheet" type="text/css" href="/styles.css">
+                        <style>
+                            /* Add your custom CSS styles here */
+                            body {
+                                font-family: Arial, sans-serif;
+                                background-color: #f0f0f0;
+                                text-align: center;
+                            }
+                            .homepage {
+                                text-align: center;
+                            }
+                            /* Other custom styles specific to the '/new' page */
+                    </style>
+            </head>
+            <body>
+            <br/>
+                ${result.username}'s token is ${theToken} <br />
+                <br/>
+                <a href="http://localhost:3000">Home</a>
+            </body>
+            </html>
                 `);
                 res.end();
                 });
@@ -34,17 +68,41 @@ const server = http.createServer(async (req, res) => {
                 fetchFile(path);
             };
             break;
+        case '/styles.css':
+            // path += "styles.css";
+            // res.statusCode=200;
+            // fetchFile(path, 'text/css');
+            serveStaticFile("public/styles.css", 'text/css', res);
+            break;
         case '/count':
             var theCount = await tokenCount();
             res.end(`
-                <!doctype html>
-                <html>
-                <body>
-                    Token count is ${theCount} <br />
-                    <a href="http://localhost:3000">[home]</a>
-                </body>
-                </html>
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <link rel="stylesheet" type="text/css" href="/styles.css">
+                <style>
+                    /* Add styles specific to the '/count' page here */
+                    body {
+                        font-family: Arial, sans-serif;
+                        background-color: #f0f0f0;
+                        text-align: center;
+                    }
+                    .homepage {
+                        text-align: center;
+                    }
+                    /* Other styles as needed */
+                </style>
+            </head>
+            <body>
+            <br/>
+                Token count is ${theCount} <br />
+                <br/>
+                <a href="http://localhost:3000">Home</a>
+            </body>
+            </html>
             `);
+            break;
         default:
             break;
     };

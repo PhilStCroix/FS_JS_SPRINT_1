@@ -1,17 +1,20 @@
-<!-- public/form.html -->
+public/form.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/styles.css">
   <title>User Token Generator</title>
 </head>
 <body>
   <h1>User Token Generator</h1>
-  <form action="/generate-token" method="post">
+  
+  <form action="/generate-token" method="post" class="form">
     <label for="username">Username:</label>
     <input type="text" id="username" name="username" required>
     <button type="submit">Generate Token</button>
   </form>
+
 </body>
 </html>

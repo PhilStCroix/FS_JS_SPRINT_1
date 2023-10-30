@@ -244,29 +244,6 @@ function fetchToken(username) {
     } )
 }
 
-// function searchToken(criteria) {
-//     if (DEBUG) console.log('token.searchToken()');
-
-//     fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
-//         if (error) throw error;
-
-//         let token = JSON.parse(data);
-
-//         const results = token.filter(token => {
-//             return token.username.toLowerCase().includes(criteria.toLowerCase());
-//         });
-
-//         if (results.length > 0) {
-//             console.log(`Tokens matching the criteria:`);
-//             results.forEach(token => {
-//                 console.log(`Token: ${token.token}, Username: ${token.username}`);
-//             });
-//         } else {
-//             console.log('No tokens found matching the criteria.');
-//         }
-//     })
-// }
-
 function searchToken(type, criteria) {
     if (DEBUG) console.log('token.searchToken()');
 
